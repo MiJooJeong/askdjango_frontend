@@ -1,27 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <table>
-        <tbody>
-            {% for post in post_list %}
-                <tr>
-                    <td>
-                        <a href="{{ post.get_absolute_url }}">
-                            {{ post.title }}
-                        </a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% extends "blog/layout.html" %}
 
-    <hr/>
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for post in post_list %}
+                            <tr>
+                                <td>
+                                    <a href="{{ post.get_absolute_url }}">
+                                        {{ post.title }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-    <a href="{% url "blog:post_new" %}">새 글 쓰기</a>
+                <hr/>
 
-</body>
-</html>
+                <a href="{% url "blog:post_new" %}" class="btn btn-primary">새 글 쓰기</a>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
