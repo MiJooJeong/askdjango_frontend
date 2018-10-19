@@ -20,6 +20,20 @@
 
                 <hr/>
 
+                {% if is_paginated %}
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-default">이전</a>
+                    {% endif %}
+
+                    {{ page_obj.number }} 페이지
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-default">다음</a>
+                    {% endif %}
+                {% endif %}
+
+                <hr/>
+
                 <a href="{% url "blog:post_new" %}" class="btn btn-primary">새 글 쓰기</a>
             </div>
         </div>
