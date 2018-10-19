@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>{{ post.title }}</h1>
+
+    {{ post.content|linebreaks }}
+
+    <hr/>
+
+    <a href="{% url "blog:index" %}">목록</a>
+    <a href="{% url "blog:post_edit" post.pk %}">수정</a>
+    <a href="{% url "blog:post_delete" post.pk %}">삭제</a>
+</body>
+</html>
