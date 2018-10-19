@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>AskDjango Blog</title>
     <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" integrity="sha384-+ENW/yibaokMnme+vBLnHMphUYxHs34h9lpdbSLuAwGkOKFRl4C34WkjazBtb7eT" crossorigin="anonymous">
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -36,7 +38,7 @@
         </footer>
     </div>
 
-    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{% static "jquery/dist/jquery.min.js" %}"></script>
+    <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %}"></script>
 </body>
 </html>
