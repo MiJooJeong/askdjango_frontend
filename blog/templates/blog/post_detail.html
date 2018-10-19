@@ -11,8 +11,24 @@
 
     <hr/>
 
+    {% for comment in post.comment_set.all %}
+        <li>
+            {{ comment.message }}
+            &dash;
+            <a href="{% url "blog:comment_edit" post.pk comment.pk %}">
+                <small>{{ comment.updated_at }}</small>
+            </a>
+            <a href="{% url "blog:comment_delete" post.pk comment.pk %}">
+                <small>삭제</small>
+            </a>
+       </li>
+    {% endfor %}
+
+    <hr/>
+
     <a href="{% url "blog:index" %}">목록</a>
     <a href="{% url "blog:post_edit" post.pk %}">수정</a>
     <a href="{% url "blog:post_delete" post.pk %}">삭제</a>
+    <a href="{% url "blog:comment_new" post.pk %}">댓글 쓰기</a>
 </body>
 </html>
