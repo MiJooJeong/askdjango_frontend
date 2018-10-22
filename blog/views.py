@@ -1,11 +1,17 @@
-import time
-
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, resolve_url
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 
-from blog.models import Post, Comment
+from blog.models import Comment
+from blog.models import Post
+from blog.serializers import PostSerializer
+from rest_framework.renderers import JSONRenderer
 
 
 class PostListView(ListView):
@@ -76,8 +82,15 @@ comment_delete = CommentDeleteView.as_view()
 def post_list_json(request):
     qs = Post.objects.all()
 
-    post_list = []
-    for post in qs:
-        post_list.append({'id': post.id, 'title': post.title, 'content': post.content})
+    # 직접 직렬화 코딩
+    # post_list = []
+    # for post in qs:
+    #     post_list.append({'id': post.id, 'title': post.title, 'content': post.content})
+    #
+    # return JsonResponse(post_list, safe=False)
 
-    return JsonResponse(post_list, safe=False)
+    # django-rest-framework 활용
+    serializer = PostSerializer(qs, many=True)
+    json_utf8_string = JSONRenderer().render(serializer.data)
+    # return HttpResponse(json_utf8_string)     # Content-Type 헤더가 text/html; charset=utf-8 로 디폴트 지정
+    return HttpResponse(json_utf8_string, content_type='application/json; charser=utf-8')   # 커스텀 지정
