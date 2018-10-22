@@ -16,7 +16,6 @@ from rest_framework.renderers import JSONRenderer
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/index.html'
     paginate_by = 10
 
     def get_template_names(self):
@@ -92,5 +91,7 @@ def post_list_json(request):
     # django-rest-framework 활용
     serializer = PostSerializer(qs, many=True)
     json_utf8_string = JSONRenderer().render(serializer.data)
+
     # return HttpResponse(json_utf8_string)     # Content-Type 헤더가 text/html; charset=utf-8 로 디폴트 지정
-    return HttpResponse(json_utf8_string, content_type='application/json; charser=utf-8')   # 커스텀 지정
+    return HttpResponse(json_utf8_string, content_type='application/json; charset=utf-8')  # 커스텀 지정
+
