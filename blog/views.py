@@ -1,6 +1,8 @@
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import resolve_url
+from django.template.defaultfilters import truncatewords
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -28,7 +30,21 @@ index = PostListView.as_view()
 
 post_new = CreateView.as_view(model=Post, fields='__all__')
 
-post_detail = DetailView.as_view(model=Post)
+
+class PostDetailView(DetailView):
+    model = Post
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            return JsonResponse({
+                'title': self.object.title,
+                'summary': truncatewords(self.object.content, 100),
+            })
+        # 템플릿 렌더링
+        return super().render_to_response(context)
+
+
+post_detail = PostDetailView.as_view()
 
 post_edit = UpdateView.as_view(model=Post, fields='__all__')
 
@@ -94,4 +110,3 @@ def post_list_json(request):
 
     # return HttpResponse(json_utf8_string)     # Content-Type 헤더가 text/html; charset=utf-8 로 디폴트 지정
     return HttpResponse(json_utf8_string, content_type='application/json; charset=utf-8')  # 커스텀 지정
-
