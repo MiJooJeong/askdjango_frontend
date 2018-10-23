@@ -1,39 +1,61 @@
 {% extends "blog/layout.html" %}
 
 {% block extra_body %}
-    <script>
-    $(function () {
-        $('#page-2-btn').click(function () {
-            $.get('?page=2')
-                .done(function (html) {
-                    console.log(html);
-                    $('#post-list-wrapper').html(html)
+<script>
+$(function() {
+    var $win = $(window);
+    var is_loading = false;
+    var current_page = null;
 
-                    var state_obj = {}; // pushState 후에 history.state로 접근 가능
-                    var title = "";
-                    var url = "?page=2"; // 이동할 URL
-                    history.pushState(state_obj, title, url);
+    var load_more = function() {
+        if (!is_loading) {
+            var next_page = (current_page || 1) + 1;
+            var next_page_url = '?page=' + next_page;
+            is_loading = true;
+
+            $.get(next_page_url).
+                done(function(html) {
+                    $('#post-list tbody').append(html);
+                    current_page = next_page;
+                }).
+                fail(function(xhr, textStatus, error) {
+                    console.log(textStatus);
                 })
-                .fail(function () {
-                    console.log('fail');
-                })
-                .always(function () {
-                    console.log('always');
+                .always(function() {
+                    console.log("always");
+                    is_loading = false;
                 });
-            return false;
-        });
+        }
+    }
+
+    $win.scroll(function() {
+        var diff = $(document).height() - parseInt($win.height());
+        if (diff == $win.scrollTop()) {
+            console.log("바닥에 왔음.");
+            load_more();
+        }
     });
-    </script>
+
+    $('#load-more-btn').click(load_more);
+});
+</script>
 {% endblock %}
 
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-sm-12" id="post-list-wrapper">
-                {% include "blog/_post_list.html" %}
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover" id="post-list">
+                    <tbody>
+                        {% include "blog/_post_list.html" %}
+                    </tbody>
+                </table>
+
+                <a id="load-more-btn" class="btn btn-primary">Load More</a>
+
+                <hr/>
+                <a href="{% url "blog:post_new" %}" class="btn btn-primary">새 글쓰기</a>
             </div>
         </div>
     </div>
-
-
 {% endblock %}
