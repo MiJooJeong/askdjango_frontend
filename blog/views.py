@@ -10,6 +10,7 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 
+from blog.forms import CommentForm
 from blog.models import Comment
 from blog.models import Post
 from blog.serializers import PostSerializer
@@ -59,7 +60,7 @@ post_delete = PostDeleteView.as_view()
 
 class CommentCreateView(CreateView):
     model = Comment
-    fields = ['message']
+    form_class = CommentForm
 
     def form_valid(self, form):
         comment = form.save(commit=False)
