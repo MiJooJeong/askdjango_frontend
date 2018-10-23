@@ -1,40 +1,66 @@
 {% extends "blog/layout.html" %}
 
+{% block extra_body %}
+<script>
+$(function() {
+    $(document).on('click', '.ajax-post-confirm', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var target_id = $(this).data('target-id');
+        var message = $(this).data('message');
+        if ( confirm(message) ) {
+            $.post(url)
+                .done(function() {
+                    $('#' + target_id).remove();
+                })
+                .fail(function(xhr, textStatus, error) {
+                    alert('failed : ' + error);
+                });
+        }
+    });
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-                <h1>{{ post.title }}</h1>
+            <h1>{{ post.title }}</h1>
 
-                {{ post.content|linebreaks }}
+            {{ post.content|linebreaks }}
 
-                <a href="{% url "blog:comment_new" post.pk %}" class="btn btn-primary btn-block">댓글 쓰기</a>
+            <hr/>
 
-                <hr/>
+            <a href="{% url "blog:comment_new" post.pk %}" class="btn btn-primary btn-block">댓글쓰기</a>
 
-                <ul>
-                {% for comment in post.comment_set.all %}
-                    <li>
-                        {{ comment.message }}
-                        &dash;
-                        <a href="{% url "blog:comment_edit" post.pk comment.pk %}">
-                            <small>{{ comment.updated_at }}</small>
-                        </a>
-                        <a href="{% url "blog:comment_delete" post.pk comment.pk %}">
-                            <small>삭제</small>
-                        </a>
-                   </li>
-                {% endfor %}
-                </ul>
+            <hr/>
 
-                <hr/>
+            <ul>
+            {% for comment in post.comment_set.all %}
+                <li id="comment-{{ comment.pk }}">
+                    {{ comment.message }}
+                    &dash;
+                    <a href="{% url "blog:comment_edit" post.pk comment.pk %}">
+                        <small>{{ comment.updated_at }}</small>
+                    </a>
 
-                <a href="{% url "blog:index" %}" class="btn btn-primary">목록</a>
-                <a href="{% url "blog:post_edit" post.pk %}" class="btn btn-primary">수정</a>
-                <a href="{% url "blog:post_delete" post.pk %}" class="btn btn-danger">삭제</a>
+                    <a href="{% url "blog:comment_delete" post.pk comment.pk %}"
+                       class="ajax-post-confirm"
+                       data-target-id="comment-{{ comment.pk }}"
+                       data-message="정말 삭제하시겠습니까?">
+                        <small>삭제</small>
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+
+            <hr/>
+
+            <a href="{% url "blog:index" %}" class="btn btn-primary">목록</a>
+            <a href="{% url "blog:post_edit" post.pk %}" class="btn btn-primary">수정</a>
+            <a href="{% url "blog:post_delete" post.pk %}" class="btn btn-danger">삭제</a>
         </div>
     </div>
 </div>
-
-
 {% endblock %}
