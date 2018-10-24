@@ -4,6 +4,9 @@
 {% block extra_body %}
 <script>
 $(function() {
+    var raw_template = $('#comment-template').html();
+    var tpl = _.template(raw_template);
+
     $('#comment-form').submit(function (e) {
         e.preventDefault();
 
@@ -20,19 +23,8 @@ $(function() {
                     alert(obj.message);
                 }
                 else {
-                    $('#comment-list').prepend([
-                        '<li id="comment-' + obj.id + '">',
-                        obj.message,
-                        '&dash;',
-                        '<a href="' + obj.edit_url + '">',
-                            '<small>' + obj.updated_at + '</small>',
-                        '</a>',
-                        '<a href="' + obj.delete_url + '" class="ajax-post-confirm" data-target-id="comment-' +
-                            obj.id + '"data-message="정말 삭제하시겠습니까?">',
-                            '<small>삭제</small>',
-                        '</a>',
-                    '</li>'
-                    ].join(''));
+                    $('#comment-list').prepend(tpl(obj));
+
                     $form[0].reset();
                 }
             })
@@ -107,4 +99,18 @@ $(function() {
         </div>
     </div>
 </div>
+
+<script type="text/x-template" id="comment-template">
+    <li id="comment-<%= id %>">
+        <%= message %>
+        &dash;
+        <a href="<%= edit_url %>">
+            <small><%= updated_at %></small>
+        </a>
+        <a href="<%= delete_url %>" class="ajax-post-confirm" data-target-id="comment-<%= id %>" data-message="정말 삭제하시겠습니까?">
+            <small>삭제</small>
+        </a>
+    </li>
+</script>
+
 {% endblock %}
