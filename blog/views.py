@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from django.shortcuts import resolve_url
 from django.template.defaultfilters import truncatewords
 from django.urls import reverse_lazy
@@ -72,24 +73,20 @@ class CommentCreateView(CreateView):
         comment.post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
         response = super().form_valid(form)
 
-        if self.request.is_ajax():
-            return JsonResponse({
-                'id': comment.id,
-                'message': comment.message,
-                'updated_at': comment.updated_at,
-                'edit_url': resolve_url('blog:comment_edit', comment.post.pk, comment.pk),
-                'delete_url': resolve_url('blog:comment_delete', comment.post.pk, comment.pk),
+        if self.request.is_ajax():  # render_to_response가 호출되지 않습니다.
+            return render(self.request, 'blog/_comment.html', {
+                'comment': comment,
             })
 
-        return response     # url redirect 응답
-
-    def form_invalid(self, form):
-        if self.request.is_ajax():
-            return JsonResponse(dict(form.errors, is_success=False))
-        return super().form_invalid(form)
+        return response
 
     def get_success_url(self):
         return resolve_url(self.object.post)
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return ['blog/_comment_form.html']
+        return ['blog/comment_form.html']
 
 
 comment_new = CommentCreateView.as_view()

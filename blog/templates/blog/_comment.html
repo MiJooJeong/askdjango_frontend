@@ -1,0 +1,14 @@
+<li id="comment-{{ comment.pk }}">
+    {{ comment.message }}
+    &dash;
+    <a href="{% url "blog:comment_edit" comment.post.pk comment.pk %}">
+        <small>{{ comment.updated_at }}</small>
+    </a>
+
+    <a href="{% url "blog:comment_delete" comment.post.pk comment.pk %}"
+       class="ajax-post-confirm"
+       data-target-id="comment-{{ comment.pk }}"
+       data-message="정말 삭제하시겠습니까?">
+        <small>삭제</small>
+    </a>
+</li>

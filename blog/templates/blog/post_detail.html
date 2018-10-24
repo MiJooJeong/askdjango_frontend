@@ -2,12 +2,30 @@
 {% load bootstrap3 %}
 
 {% block extra_body %}
+
 <script>
 $(function() {
-    var raw_template = $('#comment-template').html();
-    var tpl = _.template(raw_template);
+    $(document).on('click', '.comment-form-btn', function (e) {
+        e.preventDefault();
 
-    $('#comment-form').submit(function (e) {
+        var action_url = $(this).attr('href');
+
+        $.get(action_url)
+            .done(function (form_html) {
+                var $modal = $('#comment-form-modal');
+                $modal.find('.modal-body').html(form_html);
+                $form = $modal.find('.modal-body form');
+                $form.attr('action', action_url);
+
+                $modal.modal();
+            })
+            .fail(function (xhr, textStatus, error) {
+                alert('failed : ' + error)
+            });
+        // $('#comment_form-modal').modal();
+    });
+
+    $(document).on('submit', '#comment-form-modal form', function (e) {
         e.preventDefault();
 
         var $form = $(this);
@@ -19,16 +37,19 @@ $(function() {
         var data = $form.serialize();   // url encoded된 데이터
 
         $.post(url, data)
-            .done(function(obj) {
-                console.log("---- done ----");
-                console.log(obj);
+            .done(function(html) {
+                var $resp = $(html);
 
-                if(obj.is_success === false) {
-                    alert(obj.message);
+                if ( $resp.find('.has-error').length > 0 ) {
+                    // validation 에러일 경우, 에러 HTML 응답
+                    // form 태그의 속성정보는 그대로 유지하고, 필드 HTML만 변경
+
+                    var fields_html = $resp.html();
+                    $('#comment-form-modal .modal-body form').html(fields_html);
                 }
                 else {
-                    $('#comment-list').prepend(tpl(obj));
-
+                    $resp.prependTo('#comment-list');
+                    $('#comment- form-modal').modal('hide');
                     $form[0].reset();
                 }
             })
@@ -57,9 +78,11 @@ $(function() {
     });
 });
 </script>
+
 {% endblock %}
 
 {% block content %}
+
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
@@ -69,32 +92,14 @@ $(function() {
 
             <hr/>
 
-            <form id="comment-form" action="{% url "blog:comment_new" post.pk %}" method="post">
-                {% csrf_token %}
-                {% bootstrap_form comment_form %}
-                <input type="submit" class="btn btn-primary btn-block" />
-            </form>
-
-{#            <a href="{% url "blog:comment_new" post.pk %}" class="btn btn-primary btn-block">댓글쓰기</a>#}
+            <a href="{% url "blog:comment_new" post.pk %}"
+               class="comment-form-btn btn btn-primary btn-block">댓글쓰기</a>
 
             <hr/>
 
             <ul id="comment-list">
             {% for comment in post.comment_set.all %}
-                <li id="comment-{{ comment.pk }}">
-                    {{ comment.message }}
-                    &dash;
-                    <a href="{% url "blog:comment_edit" post.pk comment.pk %}">
-                        <small>{{ comment.updated_at }}</small>
-                    </a>
-
-                    <a href="{% url "blog:comment_delete" post.pk comment.pk %}"
-                       class="ajax-post-confirm"
-                       data-target-id="comment-{{ comment.pk }}"
-                       data-message="정말 삭제하시겠습니까?">
-                        <small>삭제</small>
-                    </a>
-                </li>
+                {% include "blog/_comment.html" %}
             {% endfor %}
             </ul>
 
@@ -107,17 +112,23 @@ $(function() {
     </div>
 </div>
 
-<script type="text/x-template" id="comment-template">
-    <li id="comment-<%= id %>">
-        <%= message %>
-        &dash;
-        <a href="<%= edit_url %>">
-            <small><%= updated_at %></small>
-        </a>
-        <a href="<%= delete_url %>" class="ajax-post-confirm" data-target-id="comment-<%= id %>" data-message="정말 삭제하시겠습니까?">
-            <small>삭제</small>
-        </a>
-    </li>
-</script>
+<div class="modal fade" id="comment-form-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Comment Form</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...<br/>
+                ...<br/>
+                ...<br/>
+                ...<br/>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
