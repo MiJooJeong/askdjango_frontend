@@ -11,6 +11,10 @@ $(function() {
         e.preventDefault();
 
         var $form = $(this);
+        var $submit = $form.find('[type=submit]');
+
+        $submit.prop('disabled', true);
+
         var url = $form.attr('action');
         var data = $form.serialize();   // url encoded된 데이터
 
@@ -30,6 +34,9 @@ $(function() {
             })
             .fail(function (xhr, textStatus, error) {
                 alert('failed : ' + error);
+            })
+            .always(function () {
+                $submit.prop('disabled', false);
             });
     });
 
@@ -45,7 +52,7 @@ $(function() {
                 })
                 .fail(function(xhr, textStatus, error) {
                     alert('failed : ' + error);
-                });
+                })
         }
     });
 });
