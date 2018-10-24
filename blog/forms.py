@@ -16,4 +16,3 @@ class CommentForm(forms.ModelForm):
                 raise forms.ValidationError('메세지에 한글이 필요합니다.')
 
         return message
-    
